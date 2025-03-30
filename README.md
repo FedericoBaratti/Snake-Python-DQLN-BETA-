@@ -137,7 +137,7 @@ Questo progetto è distribuito sotto licenza MIT. Per dettagli completi, consult
 
 ## 🤝 Contributi
 
-I contributi sono benvenuti secondo il protocollo GitFlow. Prima di contribuire, consultare [CONTRIBUTING.md](CONTRIBUTING.md) per le linee guida tecniche.
+I contributi sono benvenuti secondo il protocollo GitFlow. Prima di contribuire, consultare [MANUALE_UTENTE.md](MANUALE_UTENTE.md) per le linee guida tecniche.
 
 ## 📞 Contatti
 
