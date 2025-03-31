@@ -9,7 +9,6 @@
     <a href="#features">Features</a> •
     <a href="#installation">Installation</a> •
     <a href="#usage">Usage</a> •
-    <a href="#architecture">Architecture</a> •
     <a href="#results">Results</a> •
     <a href="#changelog">Changelog</a>
   </p>
