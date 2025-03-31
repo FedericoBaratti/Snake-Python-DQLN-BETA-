@@ -240,7 +240,7 @@ Beyond the classic Snake game, this architecture demonstrates techniques applica
   - More comprehensive test coverage
   - English localization of all documentation and UI elements
 
-### Version 2.0.1
+### Version 2.0.0
 - Initial introduction of visual model selection interface
 - Dynamic checkpoint loading system
 - Improved UI with advanced visual feedback
@@ -254,7 +254,7 @@ Beyond the classic Snake game, this architecture demonstrates techniques applica
 - Limited training configuration options
 - Eng documentation and UI
 
-### Version 2.0
+### Version 1.3.7
 - Added visual model selection interface
 - Implemented dynamic checkpoint loading system
 - Improved user interface with advanced visual feedback
