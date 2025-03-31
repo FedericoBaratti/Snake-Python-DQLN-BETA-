@@ -1,0 +1,35 @@
+{
+    "agent": "dqn",
+    "model": "dueling",
+    "buffer": "prioritized",
+    "double": true,
+    "n_steps": 3,
+    
+    "env_grid_size": 10,
+    "env_max_steps": 1000,
+    "env_reward_apple": 10.0,
+    "env_reward_death": -10.0,
+    "env_reward_step": -0.01,
+    "env_reward_distance": true,
+    
+    "hidden_dim": [128, 128],
+    "lr": 0.0005,
+    "gamma": 0.99,
+    "buffer_size": 100000,
+    "batch_size": 64,
+    "eps_start": 1.0,
+    "eps_end": 0.01,
+    "eps_decay": 0.995,
+    "target_update": 100,
+    
+    "total_episodes": 10000,
+    "eval_freq": 100,
+    "eval_episodes": 5,
+    "checkpoint_freq": 500,
+    
+    "render": false,
+    "render_delay": 0.01,
+    "debug": false,
+    "device": "auto",
+    "num_workers": 4
+} 
