@@ -80,29 +80,40 @@ Per un deployment e configurazione ottimali, consultare:
 
 ```
 snake-rl-project/
-├── frontend/              # Interfaccia grafica vettoriale accelerata
-│   ├── ui.py              # Pipeline di rendering
-│   ├── input_handler.py   # Gestione eventi asincrona
-│   └── renderer.py        # Engine grafico hardware-accelerato
-├── backend/               # Core engine e runtime di simulazione
-│   ├── snake_game.py      # Kernel di simulazione vettoriale 
-│   ├── environment.py     # Interfaccia Gymnasium con observation encoding
-│   └── utils.py           # Utilità di sistema e rilevamento hardware
-├── dqn_agent/             # Framework DQN avanzato
-│   ├── models.py          # Implementazioni neurali parametriche
-│   ├── dqn_agent.py       # Algoritmi di apprendimento ottimizzati
-│   └── config.py          # Configurazioni architetturali
-├── pretraining/           # Sistema di preaddestramento euristico
-│   ├── synthetic_env.py   # Generatore di scenari sintetici
-│   └── pretrain.py        # Pipeline di addestramento accelerato
-├── training/              # Engine di training distribuito
-│   ├── train.py           # Orchestratore di addestramento
-│   └── checkpoints/       # Repository di modelli serializzati
-├── autoplay/              # Runtime di inferenza
-│   └── autoplay.py        # Controller di esecuzione autonoma
-├── docs/                  # Documentazione tecnica completa
-├── requirements.txt       # Specifiche delle dipendenze
-└── main.py                # Entrypoint parametrico
+├── frontend/
+│   └── ui.py                     # UI grafica (Pygame)
+├── backend/
+│   ├── snake_game.py             # Logica core del gioco
+│   ├── environment.py            # Ambiente custom (Gym API)
+│   └── utils.py                  # Funzioni utilità (stato, reward)
+├── dqn_agent/
+│   ├── dqn_agent.py              # Gestione DQN e memoria replay
+│   ├── models.py                 # Architetture modulari DQN
+│   └── config.py                 # Gestione configurazione modelli
+├── pretraining/
+│   ├── synthetic_env.py          # Ambiente sintetico per pretraining
+│   └── pretrain.py               # Script pre-training sintetico
+├── training/
+│   ├── train.py                  # Training reale ottimizzato
+│   └── checkpoints/              # Salvataggio modelli
+├── autoplay/
+│   └── autoplay.py               # Autoplay integrato con UI
+├── tests/
+│   ├── test_snake_game.py        # Test unitari per SnakeGame
+│   ├── test_snake_interactive_v2.py # Test interattivo avanzato
+│   ├── test_snake_simple.py      # Test interattivo semplice
+│   ├── test_snake_auto.py        # Test automatico senza GUI
+│   └── TESTS.md                  # Documentazione sui test
+├── docs/
+│   ├── README.md                 # Panoramica del progetto
+│   ├── INSTALLATION.md           # Guida all'installazione
+│   ├── ARCHITECTURE.md           # Spiegazione architetturale dettagliata
+│   ├── TRAINING.md               # Istruzioni training e risorse
+│   ├── AUTOPLAY.md               # Guida modalità autoplay
+│   ├── CODE_GUIDE.md             # Guida dettagliata codice sorgente
+│   └── TESTS.md                  # Documentazione dettagliata dei test
+├── requirements.txt              # Dipendenze del progetto
+└── main.py                       # Punto di avvio principale
 ```
 
 ## 🎮 Utilizzo
