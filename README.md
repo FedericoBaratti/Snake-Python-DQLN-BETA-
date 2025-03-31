@@ -99,16 +99,19 @@ snake-rl-project/
 pip install -r requirements.txt
 
 # Modalità manuale con interfaccia vettoriale
-python main.py --mode manual --grid-size 20 --render-mode vector
+python main.py --mode manual --grid-size 20
 
-# Inferenza con modello avanzato preaddestrato e visualizzazione delle decision boundary
-python main.py --mode autoplay --model avanzato --checkpoint training/checkpoints/dqn_avanzato_v3.2.pt --visualization full
+# Inferenza con modello avanzato preaddestrato
+python main.py --mode autoplay --model avanzato --checkpoint training/checkpoints/dqn_avanzato_latest.pt
 
-# Training distribuito con ottimizzazione automatica degli iperparametri
-python main.py --mode train --model complesso --episodes 10000 --grid-size 20 --workers auto --auto-tune
+# Training distribuito con modello complesso
+python main.py --mode train --model complesso --episodes 10000 --grid-size 20
 
 # Preaddestramento euristico seguito da training completo e deployment in inferenza
-python main.py --mode train-and-play --model perfetto --pretrain-steps 2000000 --episodes 5000 --grid-size 30
+python main.py --mode train-and-play --model perfetto --episodes 5000 --grid-size 30
+
+# Modalità demo per una dimostrazione rapida
+python main.py --demo
 ```
 
 ## 📈 Ottimizzazione Hardware-Aware

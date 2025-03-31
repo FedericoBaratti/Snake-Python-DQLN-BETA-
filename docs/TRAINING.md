@@ -634,7 +634,14 @@ Dopo il training, valuta le prestazioni del modello:
 
 ```bash
 # Valuta il modello su 100 episodi
-python -m autoplay.evaluate --model base --checkpoint training/checkpoints/dqn_base_latest.pt --episodes 100
+python main.py --mode autoplay --model base --checkpoint training/checkpoints/dqn_base_latest.pt
+```
+
+Puoi anche riavviare l'addestramento da un checkpoint esistente:
+
+```bash
+# Riprendi l'addestramento da un checkpoint
+python main.py --mode train --model base --checkpoint training/checkpoints/dqn_base_latest.pt --episodes 500
 ```
 
 ## 🏆 Risultati Attesi

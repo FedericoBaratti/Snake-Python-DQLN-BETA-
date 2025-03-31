@@ -35,11 +35,11 @@ Per avviare immediatamente l'inferenza con un agente preaddestrato:
 # Inferenza con agente base (adatto per CPU-only)
 python main.py --mode autoplay --model base
 
-# Inferenza con agente complesso e visualizzazione avanzata
-python main.py --mode autoplay --model complesso --visualization full --grid-size 20
+# Inferenza con agente complesso su una griglia più grande
+python main.py --mode autoplay --model complesso --grid-size 20
 
-# Inferenza con agente perfetto ottimizzato per GPU
-python main.py --mode autoplay --model perfetto --device cuda --optimization full
+# Inferenza con agente perfetto e checkpoint personalizzato
+python main.py --mode autoplay --model perfetto --checkpoint training/checkpoints/dqn_perfetto_final.pt
 ```
 
 ### Acceleration & Optimization Parameters
@@ -144,8 +144,8 @@ Questa pipeline esegue:
 # Configurazione bilanciata per training e deployment immediato
 python main.py --mode train-and-play --model avanzato --episodes 2000
 
-# Configurazione avanzata con metriche estese
-python main.py --mode train-and-play --model complesso --episodes 5000 --telemetry full
+# Configurazione avanzata con più episodi
+python main.py --mode train-and-play --model complesso --episodes 5000 --grid-size 15
 ```
 
 Questa modalità implementa un workflow end-to-end che:
@@ -153,7 +153,7 @@ Questa modalità implementa un workflow end-to-end che:
 1. **Esegue il training completo** con la configurazione specificata
 2. **Ottimizza automaticamente il modello** per l'inferenza
 3. **Inizializza il runtime di autoplay** con il modello appena addestrato
-4. **Genera report dettagliati** sulle performance
+4. **Visualizza il gioco e le statistiche** per valutare le performance
 
 ## ⚙️ Configurazione Avanzata del Runtime
 
@@ -165,14 +165,11 @@ Il sistema di autoplay supporta configurazioni granulari per ottimizzare diversi
 |-----------|-------------|--------|---------|---------|
 | `--model` | Complessità dell'architettura | base, avanzato, complesso, perfetto | base | Determina la capacità di pianificazione |
 | `--checkpoint` | Percorso specifico del modello | path | auto | Permette di selezionare modelli specifici |
-| `--grid-size` | Dimensione della griglia di gioco | 5-100 | 10 | Influisce sulla complessità dell'ambiente |
-| `--speed` | Velocità di esecuzione (FPS) | 1-120 | 10 | Controllabilità vs fluidità |
-| `--render-mode` | Modalità di rendering | pixel, vector, hybrid | vector | Performance vs qualità visiva |
-| `--games` | Numero di partite consecutive | 1-∞ | ∞ | Utile per benchmark automatizzati |
-| `--max-steps` | Steps massimi per partita | 10-100000 | 1000 | Previene loop infiniti | 
-| `--seed` | Seed per inizializzazione | int | random | Riproducibilità dei risultati |
-| `--state-representation` | Formato dell'input al modello | grid, features, vision | grid | Diversi encoding dello stato |
-| `--parallel-envs` | Ambienti paralleli per inferenza | 1-64 | 1 | Throughput vs latenza |
+| `--grid-size` | Dimensione della griglia di gioco | 5-100 | 20 | Influisce sulla complessità dell'ambiente |
+| `--speed` | Velocità di esecuzione | 1-20 | 10 | Controlla la velocità iniziale del gioco |
+| `--mode` | Modalità di esecuzione | manual, autoplay, train, train-and-play | manual | Determina come il gioco viene eseguito |
+| `--episodes` | Numero di episodi di training | 100-10000 | varia per modello | Influisce sulla qualità dell'addestramento |
+| `--demo` | Attiva la modalità demo | flag | false | Avvia una dimostrazione rapida con parametri ottimizzati |
 
 ### Customized Execution Profiles
 

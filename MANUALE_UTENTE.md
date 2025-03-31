@@ -130,15 +130,19 @@ L'interfaccia di gioco è composta da:
 ### Addestramento Base
 Per addestrare rapidamente un modello base:
 ```
-python train_model.py
+python main.py --mode train --model base --grid-size 10 --episodes 300
 ```
 
-Questo script:
+Questo comando:
 1. Crea e addestra un modello DQN base su una griglia 10x10
 2. Esegue 300 episodi di addestramento (sufficiente per dimostrazioni)
-3. Salva il modello in `training/checkpoints/dqn_base_demo.pt`
-4. Esegue una valutazione del modello su 10 episodi
-5. Mostra come utilizzare il modello addestrato
+3. Salva il modello in `training/checkpoints/dqn_base_latest.pt` e `training/checkpoints/dqn_base_final.pt`
+4. Esegue una valutazione del modello periodicamente durante l'addestramento
+
+Per addestrare e poi passare direttamente alla modalità autoplay:
+```
+python main.py --mode train-and-play --model base --grid-size 10 --episodes 300
+```
 
 ### Addestramento Personalizzato
 Per un addestramento più avanzato:
@@ -154,6 +158,14 @@ python pretraining/pretrain.py --model avanzato
 
 Questo genera esperienze sintetiche per dare all'agente una base di conoscenze prima dell'addestramento reale.
 
+### Modalità Demo
+Per una dimostrazione rapida del sistema di addestramento e autoplay:
+```
+python main.py --demo
+```
+
+Questa modalità utilizza tutti i parametri ottimizzati per un'esperienza dimostrativa veloce.
+
 ### Monitoraggio dell'Addestramento
 Durante l'addestramento, vengono visualizzate le seguenti metriche:
 - Episodio corrente e progresso totale
@@ -165,7 +177,13 @@ Durante l'addestramento, vengono visualizzate le seguenti metriche:
 ### Checkpoint
 I modelli vengono salvati periodicamente in `training/checkpoints/`. Puoi utilizzare questi checkpoint per:
 - Riprendere l'addestramento da un punto specifico
+  ```
+  python main.py --mode train --model base --checkpoint training/checkpoints/dqn_base_ep1000.pt --episodes 2000
+  ```
 - Utilizzare l'agente addestrato in modalità autoplay
+  ```
+  python main.py --mode autoplay --model base --checkpoint training/checkpoints/dqn_base_final.pt
+  ```
 - Confrontare le prestazioni di diversi modelli
 
 ## ⚙️ Configurazione Avanzata

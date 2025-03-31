@@ -305,11 +305,11 @@ python -m snake_dqn.tools.cpu_check
 
 **Soluzione**:
 ```bash
-# Utilizzo di backend di rendering software
-python main.py --mode manual --render-backend software
+# Prova a ridurre la dimensione della griglia
+python main.py --grid-size 10 --speed 5
 
-# Diagnosi problemi grafici
-python -m snake_dqn.tools.graphics_check
+# Esegui la modalità demo che utilizza impostazioni ottimizzate
+python main.py --demo
 ```
 
 ## 🔄 Aggiornamento del Sistema
@@ -322,36 +322,6 @@ git pull origin main
 
 # Aggiornamento delle dipendenze
 pip install -r requirements.txt --upgrade
-
-# Pulizia cache e file temporanei
-python -m snake_dqn.tools.clean_cache
-```
-
-## 📊 Validazione dell'Ambiente
-
-Il framework include un tool di validazione completa per verificare la corretta configurazione dell'ambiente:
-
-```bash
-# Esecuzione validazione completa
-python -m snake_dqn.validate --all
-
-# Validazione componenti specifici
-python -m snake_dqn.validate --gpu --cpu --memory --display
-```
-
-Output di un sistema correttamente configurato:
-```
-✅ Python: 3.11.9 (compatibile)
-✅ Sistema Operativo: Windows 10 (build 21H2+)
-✅ CPU: AMD Ryzen 7 5800X (8 core, AVX2 supportato)
-✅ Memoria: 32GB disponibili (sufficiente)
-✅ GPU: NVIDIA RTX 3070 (8GB VRAM, compute capability 8.6)
-✅ CUDA: 11.8 (compatibile con PyTorch 2.2.0)
-✅ Display: 2560x1440 @ 144Hz (compatibile)
-✅ Librerie richieste: tutte installate correttamente
-✅ Benchmark veloce: prestazioni nei parametri attesi
-
-💯 Ambiente ottimale! Il sistema è configurato per massime prestazioni.
 ```
 
 ---
