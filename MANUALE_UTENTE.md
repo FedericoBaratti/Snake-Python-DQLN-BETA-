@@ -6,14 +6,21 @@
 3. [Avvio del Gioco](#avvio-del-gioco)
 4. [Modalità di Gioco](#modalità-di-gioco)
 5. [Comandi di Gioco](#comandi-di-gioco)
-6. [Addestramento del Modello](#addestramento-del-modello)
-7. [Configurazione Avanzata](#configurazione-avanzata)
-8. [Risoluzione Problemi](#risoluzione-problemi)
-9. [Funzionalità Aggiuntive](#funzionalità-aggiuntive)
+6. [Selezione del Modello](#selezione-del-modello)
+7. [Addestramento del Modello](#addestramento-del-modello)
+8. [Configurazione Avanzata](#configurazione-avanzata)
+9. [Risoluzione Problemi](#risoluzione-problemi)
+10. [Funzionalità Aggiuntive](#funzionalità-aggiuntive)
+11. [Architettura del Software](#architettura-del-software)
+12. [Test del Sistema](#test-del-sistema)
+13. [Utilizzo per Ricerca e Sviluppo](#utilizzo-per-ricerca-e-sviluppo)
+14. [Note Finali](#note-finali)
 
 ## 🎮 Introduzione
 
 Snake con UI e Deep Q-Learning è un'implementazione avanzata del classico gioco Snake che integra tecniche di Reinforcement Learning per addestrare un agente in grado di giocare autonomamente. Il progetto combina un'interfaccia grafica intuitiva con algoritmi di Deep Q-Network (DQN) per creare un ambiente interattivo dove puoi giocare manualmente o lasciare che l'intelligenza artificiale giochi per te.
+
+Versione 2.0 aggiunge un'interfaccia migliorata con supporto per la selezione visuale dei modelli e altre funzionalità avanzate.
 
 ## 💾 Installazione
 
@@ -61,6 +68,7 @@ Questo avvia il gioco in modalità manuale con le impostazioni predefinite.
 - `--speed`: Velocità iniziale del gioco (1-20, predefinito: 10)
 - `--episodes`: Numero di episodi per l'addestramento
 - `--demo`: Attiva la modalità demo (addestramento rapido)
+- `--select-model`: Avvia direttamente con la finestra di selezione del modello
 
 ### Esempi di Utilizzo
 ```
@@ -69,6 +77,9 @@ python main.py --grid-size 15
 
 # Avvia la modalità autoplay con un modello avanzato preaddestrato
 python main.py --mode autoplay --model avanzato --checkpoint training/checkpoints/dqn_avanzato_latest.pt
+
+# Avvia la modalità autoplay e mostra subito la finestra di selezione del modello
+python main.py --mode autoplay --select-model
 
 # Addestra un nuovo modello base e poi gioca in autoplay
 python main.py --mode train-and-play --model base --grid-size 10 --episodes 1000
@@ -116,14 +127,52 @@ Simile alla modalità di addestramento, ma al termine passa automaticamente alla
 
 ### Controlli Aggiuntivi
 - **T**: Attiva/disattiva modalità autoplay (se disponibile)
+- **M**: Apri/chiudi la finestra di selezione del modello
 - **+/-**: Aumenta/diminuisci la velocità del gioco
 - **1-4**: Imposta il livello di difficoltà (1=facile, 4=difficile)
+
+### Controlli Finestra Selezione Modello
+- **↑/↓**: Naviga tra i modelli disponibili
+- **Invio**: Seleziona e carica il modello evidenziato
+- **ESC**: Chiudi la finestra di selezione senza caricare
 
 ### Interfaccia Utente
 L'interfaccia di gioco è composta da:
 - **Griglia di gioco**: Area principale dove si svolge il gioco
 - **Sidebar**: Mostra punteggio, record, modalità corrente e altre informazioni
 - **Informazioni di stato**: Indicano se il gioco è in pausa, in modalità autoplay, ecc.
+- **Finestra di selezione modello**: Interfaccia per selezionare e caricare modelli preaddestrati
+
+## 🤖 Selezione del Modello
+
+La versione 2.0 introduce un'interfaccia visuale per la selezione dei modelli preaddestrati, che permette di:
+
+1. Visualizzare tutti i checkpoint disponibili
+2. Caricare dinamicamente un modello senza riavviare il gioco
+3. Alternare tra diversi modelli per confrontarne le prestazioni
+
+### Utilizzo della Finestra di Selezione
+
+Per aprire la finestra di selezione del modello:
+- Premi il tasto **M** durante il gioco
+- Oppure avvia il gioco con il parametro `--select-model`
+
+Nella finestra di selezione:
+1. Usa i tasti **↑/↓** per navigare tra i modelli disponibili
+2. Premi **Invio** per selezionare e caricare il modello evidenziato
+3. Premi **ESC** per chiudere la finestra senza caricare un modello
+
+Una volta caricato un modello, la modalità autoplay verrà attivata automaticamente e potrai osservare come il modello selezionato gioca al gioco.
+
+### Formati dei Modelli
+
+I modelli sono salvati nella directory `training/checkpoints/` con il seguente formato di nome:
+- `dqn_base_latest.pt`: Ultimo modello base salvato
+- `dqn_avanzato_final.pt`: Modello avanzato finale
+- `dqn_complesso_ep1000.pt`: Modello complesso salvato dopo 1000 episodi
+- `dqn_perfetto_ep5000.pt`: Modello perfetto salvato dopo 5000 episodi
+
+La complessità del modello viene riconosciuta automaticamente dal nome del file.
 
 ## 🧠 Addestramento del Modello
 
@@ -267,6 +316,12 @@ Su sistemi senza GPU, il software utilizza ottimizzazioni specifiche per CPU:
 
 ## 🔍 Funzionalità Aggiuntive
 
+### Selezione Dinamica del Modello
+La nuova interfaccia di selezione del modello permette di:
+- Visualizzare e selezionare qualsiasi modello disponibile nel sistema
+- Cambiare modello durante il gioco senza riavviare l'applicazione
+- Confrontare diversi modelli in tempo reale
+
 ### Modalità Demo
 La modalità demo è pensata per una dimostrazione rapida delle capacità del software:
 ```
@@ -316,7 +371,85 @@ Il sistema è organizzato secondo un'architettura modulare con diversi component
 6. **Autoplay Controller** (`autoplay/`)
    - Coordina l'interazione tra l'agente addestrato e l'ambiente di gioco
 
+7. **Test Suite** (`tests/`)
+   - Implementa test unitari e interattivi per il sistema
+   - Offre ambienti di test automatizzati e manuali
+
 Per maggiori dettagli sull'architettura, consulta il file [ARCHITECTURE.md](docs/ARCHITECTURE.md).
+
+## 🧪 Test del Sistema
+
+Il sistema include una suite completa di test per verificare il corretto funzionamento del gioco Snake e delle sue componenti. Questi test sono disponibili nella cartella `tests/` e possono essere utilizzati sia per lo sviluppo che per verificare l'installazione.
+
+### Tipi di Test Disponibili
+
+#### 1. Test Unitari (`test_snake_game.py`)
+Test completi che verificano tutte le funzionalità del gioco Snake utilizzando il framework unittest di Python.
+
+**Esecuzione:**
+```bash
+python -m tests.test_snake_game
+```
+
+Per eseguire un test specifico:
+```bash
+python -m tests.test_snake_game TestSnakeGame.test_movement
+```
+
+#### 2. Test Interattivo Avanzato (`test_snake_interactive_v2.py`)
+Interfaccia grafica avanzata che permette di testare manualmente il gioco o utilizzare una modalità automatica con un algoritmo semplice.
+
+**Caratteristiche:**
+- Controlli con frecce direzionali
+- Modalità automatica attivabile con 'A'
+- Regolazione velocità con '+/-'
+- Pausa/Riavvio con 'P'/'R'
+
+**Esecuzione:**
+```bash
+python -m tests.test_snake_interactive_v2
+```
+
+#### 3. Test Interattivo Semplice (`test_snake_simple.py`)
+Versione semplificata dell'interfaccia grafica per test rapidi e leggeri.
+
+**Esecuzione:**
+```bash
+python -m tests.test_snake_simple
+```
+
+#### 4. Test Automatico (`test_snake_auto.py`)
+Test che esegue automaticamente il gioco senza interfaccia grafica, utilizzando un algoritmo euristico.
+
+**Esecuzione:**
+```bash
+python -m tests.test_snake_auto
+```
+
+Per eseguire più test consecutivi e vedere statistiche:
+```bash
+python -m tests.test_snake_auto 5  # Esegue 5 test
+```
+
+### Utilizzo dei Test per il Debugging
+
+I test interattivi sono particolarmente utili per:
+- Verificare il corretto funzionamento grafico del gioco
+- Testare le meccaniche di movimento e collisione
+- Verificare l'integrazione tra backend e frontend
+
+I test automatici sono ideali per:
+- Verificare rapidamente le performance del gioco
+- Identificare potenziali problemi di stabilità
+- Generare dati statistici sul funzionamento
+
+### Documentazione Dettagliata dei Test
+
+Per una documentazione completa sui test disponibili, consultare il file [TESTS.md](docs/TESTS.md), che include:
+- Spiegazione dettagliata di ogni test
+- Guida all'esecuzione e personalizzazione
+- Casi d'uso comuni e configurazioni avanzate
+- Suggerimenti per la risoluzione di problemi
 
 ## 🚀 Utilizzo per Ricerca e Sviluppo
 
@@ -346,5 +479,7 @@ Il sistema include strumenti per monitorare le prestazioni:
 ## 📝 Note Finali
 
 Questo software è stato progettato come strumento educativo per imparare i principi del Reinforcement Learning attraverso un'applicazione pratica. Il codice è organizzato in modo modulare per facilitare l'apprendimento e la sperimentazione.
+
+La versione 2.0 introduce significativi miglioramenti all'interfaccia utente e nuove funzionalità per una migliore esperienza di utilizzo.
 
 Per maggiori informazioni o supporto, consulta la documentazione di ogni modulo o visita il repository del progetto. 

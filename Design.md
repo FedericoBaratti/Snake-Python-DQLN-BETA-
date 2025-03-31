@@ -36,13 +36,20 @@ snake-rl-project/
 │   └── checkpoints/              # Salvataggio modelli
 ├── autoplay/
 │   └── autoplay.py               # Autoplay integrato con UI
+├── tests/
+│   ├── test_snake_game.py        # Test unitari per SnakeGame
+│   ├── test_snake_interactive_v2.py # Test interattivo avanzato
+│   ├── test_snake_simple.py      # Test interattivo semplice
+│   ├── test_snake_auto.py        # Test automatico senza GUI
+│   └── TESTS.md                  # Documentazione sui test
 ├── docs/
 │   ├── README.md                 # Panoramica del progetto
-│   ├── INSTALLATION.md           # Guida all’installazione
+│   ├── INSTALLATION.md           # Guida all'installazione
 │   ├── ARCHITECTURE.md           # Spiegazione architetturale dettagliata
 │   ├── TRAINING.md               # Istruzioni training e risorse
 │   ├── AUTOPLAY.md               # Guida modalità autoplay
-│   └── CODE_GUIDE.md             # Guida dettagliata codice sorgente
+│   ├── CODE_GUIDE.md             # Guida dettagliata codice sorgente
+│   └── TESTS.md                  # Documentazione dettagliata dei test
 ├── requirements.txt              # Dipendenze del progetto
 └── main.py                       # Punto di avvio principale
 ```
@@ -155,6 +162,48 @@ else → CPU multi-core (massimo carico distribuito)
 
 ---
 
+## 🧪 **Testing completo (`tests/`)**
+
+### 📌 **Tipologie di test implementate**
+
+1. **Test Unitari (`test_snake_game.py`)**
+   - Verifica funzionamento di tutte le componenti del gioco
+   - Test inizializzazione, movimento, collisioni, punteggio
+   - Validazione comportamento completo del gioco
+
+2. **Test Interattivo Avanzato (`test_snake_interactive_v2.py`)**
+   - GUI completa per testing manuale e automatico
+   - Modalità auto con intelligenza semplice
+   - Regolazione velocità, visualizzazione statistiche
+   - Controlli avanzati di pausa/reset/replay
+
+3. **Test Interattivo Semplice (`test_snake_simple.py`)**
+   - Versione leggera per test rapidi
+   - Interfaccia minimalista con controlli essenziali
+
+4. **Test Automatico (`test_snake_auto.py`)**
+   - Esecuzione automatica senza UI
+   - Algoritmo euristico semplice per valutare gameplay
+   - Metriche di performance e statistiche multiple
+
+### 📌 **Documentazione dei test**
+
+- **`TESTS.md`**: Documentazione dettagliata sull'uso dei test
+- Guida per esecuzione e personalizzazione
+- Spiegazione casi d'uso e configurazioni
+
+**Esecuzione test unitari:**
+```bash
+python -m tests.test_snake_game
+```
+
+**Esecuzione test interattivi:**
+```bash
+python -m tests.test_snake_interactive_v2
+```
+
+---
+
 ## 📚 **Documentazione obbligatoria dettagliata (docs/)**
 
 - `README.md`: Introduzione generale progetto, configurazione e livelli di complessità.
@@ -163,16 +212,7 @@ else → CPU multi-core (massimo carico distribuito)
 - `TRAINING.md`: Istruzioni dettagliate per training ottimizzato con hardware disponibile.
 - `AUTOPLAY.md`: Guida modalità autonoma.
 - `CODE_GUIDE.md`: Spiegazione dettagliata e guida completa ai file sorgente.
-
----
-
-## 🧪 **Testing e qualità del codice**
-
-- Test unitari essenziali:
-  - Backend (`SnakeGame` e `SnakeEnv`)
-  - Agente DQN (es. memoria replay, scelta azioni)
-  - Frontend/UI (funzionalità base)
-- Codice modulare, leggibile, commentato chiaramente.
+- `TESTS.md`: Documentazione dettagliata sui test disponibili e loro utilizzo.
 
 ---
 
@@ -189,4 +229,4 @@ matplotlib
 
 ## 🚨 **Conclusione:**
 Questo design definitivo è super-esplicativo, completo e pronto per essere implementato integralmente.  
-Garantisce chiarezza architetturale, modularità, ottimizzazione hardware e qualità del codice, con una documentazione esaustiva per un'esperienza completa, professionale e pronta all’uso.
+Garantisce chiarezza architetturale, modularità, ottimizzazione hardware e qualità del codice, con una documentazione esaustiva per un'esperienza completa, professionale e pronta all'uso.

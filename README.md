@@ -1,6 +1,16 @@
-# 🐍 Snake con UI e Deep Q-Learning (DQN)
+# 🐍 Snake con UI e Deep Q-Learning (DQN) - Versione 2.0
 
 Benvenuti nell'ecosistema **Snake con UI e Deep Q-Learning**, un framework avanzato per la sperimentazione di algoritmi di Reinforcement Learning applicati al classico gioco Snake. Questo progetto implementa un ambiente completamente parametrizzabile con architetture DQN ottimizzate e un'interfaccia grafica ad alte prestazioni.
+
+## 🆕 Novità della Versione 2.0
+
+Questa versione introduce importanti miglioramenti all'interfaccia utente e nuove funzionalità:
+
+- **Selezione visuale dei modelli**: Interfaccia intuitiva per caricare dinamicamente modelli preaddestrati
+- **Cambio modello in runtime**: Possibilità di alternare tra diversi modelli senza riavviare l'applicazione
+- **UI migliorata**: Design più moderno e responsive con migliore feedback visivo
+- **Modalità di avvio rapido**: Parametro `--select-model` per avviare direttamente con la selezione del modello
+- **Documentazione aggiornata**: Manuale utente completo con dettagli su tutte le nuove funzionalità
 
 ## 📋 Panoramica Architetturale
 
@@ -12,6 +22,7 @@ Il framework è costruito su un'architettura a microservizi con disaccoppiamento
 4. 🔄 **Sistema di preaddestramento sintetico** con generazione euristica di scenari ottimali
 5. 🛠️ **Training engine distribuito** con supporto per multi-GPU e accelerazione hardware specializzata
 6. 📊 **Telemetria avanzata** con visualizzazione in tempo reale delle metriche di apprendimento
+7. 🖱️ **Interfaccia di selezione modelli** con supporto per caricamento dinamico e confronto in tempo reale
 
 ## 🚀 Architettura Tecnica
 
@@ -52,6 +63,7 @@ Il framework implementa una suite di architetture neurali progressive, ciascuna 
 3. **Ottimizzazione fine-grained** con modulazione automatica degli iperparametri durante il training
 4. **Orchestrazione intelligente delle risorse** con bilanciamento dinamico tra CPU e GPU
 5. **Visualizzazione avanzata delle decision boundary** durante l'esecuzione dell'agente
+6. **Selezione dinamica del modello** con caricamento a runtime di checkpoint preaddestrati
 
 ## 📌 Getting Started
 
@@ -62,6 +74,7 @@ Per un deployment e configurazione ottimali, consultare:
 - [Manuale di Training](TRAINING.md) - Protocolli di addestramento e ottimizzazione degli iperparametri
 - [Documentazione Autoplay](AUTOPLAY.md) - Configurazione dell'agente in modalità inferenza
 - [Specifiche del Codice](CODE_GUIDE.md) - Documentazione API e specifiche di implementazione
+- [Manuale Utente](MANUALE_UTENTE.md) - Guida completa all'utilizzo del software e tutte le funzionalità
 
 ## 🔍 Struttura del Repository
 
@@ -104,6 +117,9 @@ python main.py --mode manual --grid-size 20
 # Inferenza con modello avanzato preaddestrato
 python main.py --mode autoplay --model avanzato --checkpoint training/checkpoints/dqn_avanzato_latest.pt
 
+# Avvio con selezione visuale del modello
+python main.py --mode autoplay --select-model
+
 # Training distribuito con modello complesso
 python main.py --mode train --model complesso --episodes 10000 --grid-size 20
 
@@ -145,6 +161,22 @@ I contributi sono benvenuti secondo il protocollo GitFlow. Prima di contribuire,
 ## 📞 Contatti
 
 Per segnalazioni tecniche o richieste di feature, utilizzare il sistema di issue tracking o contattare gli autori tramite i canali ufficiali.
+
+## 📝 Changelog
+
+### Versione 2.0
+- Aggiunta interfaccia di selezione visuale dei modelli
+- Implementato sistema di caricamento dinamico dei checkpoint
+- Migliorata l'interfaccia utente con feedback visivo avanzato
+- Aggiunto parametro di avvio rapido `--select-model`
+- Aggiornata documentazione e manuale utente
+
+### Versione 1.0
+- Rilascio iniziale con funzionalità di base
+- Implementazione del gioco Snake con controlli manuali
+- Agente DQN con supporto per modalità autoplay
+- Sistema di addestramento con checkpoint
+- Interfaccia grafica in Pygame
 
 ---
 

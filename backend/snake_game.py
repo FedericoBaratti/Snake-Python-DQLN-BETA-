@@ -71,7 +71,33 @@ class SnakeGame:
         return self.get_state()
     
     def place_food(self):
-        """Posiziona il cibo in una posizione casuale non occupata dal serpente."""
+        """Posiziona il cibo in una posizione casuale non occupata dal serpente.
+           Con una probabilità del 25%, posiziona il cibo vicino alla testa del serpente
+           per facilitare l'apprendimento del modello."""
+        head = self.snake[0]
+        head_x, head_y = head
+        
+        # Con probabilità 25%, metti il cibo vicino alla testa per aiutare il modello
+        if random.random() < 0.25:
+            max_attempts = 15
+            attempts = 0
+            while attempts < max_attempts:
+                # Genera un offset casuale tra -5 e 5 dalla testa
+                offset_x = random.randint(-5, 5)
+                offset_y = random.randint(-5, 5)
+                
+                # Calcola la posizione candidata per il cibo
+                food_x = max(0, min(self.grid_size - 1, head_x + offset_x))
+                food_y = max(0, min(self.grid_size - 1, head_y + offset_y))
+                
+                self.food = (food_x, food_y)
+                
+                # Verifica che il cibo non sia posizionato sul serpente
+                if self.food not in self.snake:
+                    return
+                attempts += 1
+                
+        # Altrimenti, usa il metodo standard per posizionare il cibo
         while True:
             self.food = (
                 random.randint(0, self.grid_size - 1),
@@ -131,6 +157,9 @@ class SnakeGame:
         danger_straight = self.is_collision(self._get_new_head(self.direction))
         danger_right = self.is_collision(self._get_new_head(self._turn_right(self.direction)))
         danger_left = self.is_collision(self._get_new_head(self._turn_left(self.direction)))
+        # Aggiungiamo il pericolo quando si gira indietro (180 gradi)
+        back_direction = self._turn_right(self._turn_right(self.direction))
+        danger_back = self.is_collision(self._get_new_head(back_direction))
         
         # Crea un vettore di features
         features = np.array([
@@ -138,6 +167,7 @@ class SnakeGame:
             danger_straight,
             danger_right,
             danger_left,
+            danger_back,
             # Direzione corrente
             *direction_state,
             # Posizione relativa del cibo
@@ -211,6 +241,7 @@ class SnakeGame:
                 0 - Vai dritto
                 1 - Gira a destra
                 2 - Gira a sinistra
+                3 - Vai indietro (gira di 180 gradi)
         
         Returns:
             tuple:
@@ -230,6 +261,8 @@ class SnakeGame:
             self.direction = self._turn_right(self.direction)
         elif action == 2:  # Gira a sinistra
             self.direction = self._turn_left(self.direction)
+        elif action == 3:  # Gira di 180 gradi (indietro)
+            self.direction = self._turn_right(self._turn_right(self.direction))
         # Se action == 0, continua dritto (nessun cambio di direzione)
         
         # Calcola la nuova posizione della testa
@@ -256,20 +289,22 @@ class SnakeGame:
             self.snake.pop()
             
             # Piccolo reward negativo per ogni passo senza cibo per incoraggiare efficienza
-            reward = -0.01
+            reward = -0.05
             
             # Calcola la distanza dal cibo
             head = self.snake[0]
             old_distance = abs(head[0] - self.food[0]) + abs(head[1] - self.food[1])
             new_distance = abs(new_head[0] - self.food[0]) + abs(new_head[1] - self.food[1])
             
-            # Piccolo reward per avvicinarsi al cibo
+            # Reward più forte per avvicinarsi al cibo
             if new_distance < old_distance:
-                reward += 0.1
+                reward += 0.2
+            elif new_distance > old_distance:
+                reward -= 0.1  # Penalità per allontanarsi dal cibo
             
             # Penalità se il serpente sta girando in tondo senza mangiare
             if self.steps_without_food > self.grid_size * 2:
-                reward -= 0.2
+                reward -= 0.3
         
         # Termina il gioco se è troppo lungo senza mangiare
         if self.steps_without_food > self.grid_size * 10:

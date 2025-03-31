@@ -56,7 +56,7 @@ def train_agent(model_complexity="base", checkpoint_path=None, config=None,
     game = SnakeGame(grid_size=grid_size)
     env = SnakeEnv(game, use_normalized_state=True)
     
-    # Ottieni dimensioni di stato e azione
+    # Ottieni le dimensioni di stato e azione
     state_dim = env.observation_space.shape[0]
     action_dim = env.action_space.n
     
@@ -68,6 +68,17 @@ def train_agent(model_complexity="base", checkpoint_path=None, config=None,
     if checkpoint_path and os.path.exists(checkpoint_path):
         print(f"Caricamento agente dal checkpoint: {checkpoint_path}")
         agent = DQNAgent.load(checkpoint_path, device=device)
+        
+        # Verifica compatibilità dell'agente con la nuova dimensione delle azioni
+        if agent.action_dim != action_dim:
+            print(f"ATTENZIONE: L'agente caricato ha {agent.action_dim} azioni, ma l'ambiente ne ha {action_dim}")
+            print("Creazione di un nuovo agente con la dimensione corretta delle azioni")
+            agent = DQNAgent(
+                state_dim=state_dim,
+                action_dim=action_dim,
+                complexity=model_complexity,
+                config=config
+            )
     else:
         print(f"Creazione nuovo agente con complessità: {model_complexity}")
         agent = DQNAgent(

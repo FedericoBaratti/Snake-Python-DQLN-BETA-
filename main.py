@@ -6,8 +6,13 @@ Snake con UI e Deep Q-Learning (DQN)
 Entry point principale del progetto che avvia l'interfaccia utente
 e permette di scegliere tra modalità di gioco manuale e autoplay.
 
+Include supporto per:
+- Selezione dinamica del modello da caricare
+- Interfaccia grafica migliorata con selezione visuale
+- Caricamento di modelli preaddestrati di diverse complessità
+
 Autore: Baratti Federico
-Versione: 1.0
+Versione: 2.0
 """
 
 import argparse
@@ -47,8 +52,13 @@ if __name__ == "__main__":
                         help='Numero di episodi di training (usa default se non specificato)')
     parser.add_argument('--demo', action='store_true',
                         help='Modalità demo: addestra un modello base per pochi episodi (300) su una griglia piccola (10x10)')
+    parser.add_argument('--select-model', action='store_true',
+                        help='Avvia direttamente con la finestra di selezione del modello')
     
     args = parser.parse_args()
+    
+    # Debug: stampa gli argomenti ricevuti
+    print(f"Argomenti ricevuti: {args}")
     
     # Ottieni la configurazione in base al livello di complessità
     config = get_config(complexity=args.model)
@@ -105,6 +115,12 @@ if __name__ == "__main__":
         )
         # Avvia l'interfaccia con il controller autoplay
         ui = GameUI(game=game, speed=args.speed, autoplay_controller=controller)
+        
+        # Se richiesto, mostra subito il selettore di modelli
+        if hasattr(args, 'select_model') and args.select_model:
+            print("Attivazione finestra di selezione modello...")
+            ui.toggle_model_selector()
+            
         ui.run()
     else:
         # Modalità manuale

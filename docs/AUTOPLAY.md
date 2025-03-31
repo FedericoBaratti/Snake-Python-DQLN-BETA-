@@ -530,6 +530,102 @@ Questa configurazione:
 3. Adatta l'agente a scenari non visti durante il training
 4. Implementa meccanismi di lifelong learning
 
+## 🔄 Selezione Dinamica del Modello
+
+La versione 2.0 introduce un'interfaccia visuale per la selezione e il caricamento dinamico dei modelli durante l'esecuzione, senza necessità di riavviare l'applicazione.
+
+### Architettura del Sistema di Selezione Modelli
+
+Il sistema di selezione modelli si integra con l'interfaccia utente esistente per offrire:
+
+1. **Esplorazione di checkpoint**: Scansione automatica della directory `training/checkpoints/` per individuare tutti i modelli disponibili
+2. **Interfaccia di selezione**: Finestra modale con navigazione tramite tastiera per selezionare il modello desiderato
+3. **Caricamento dinamico**: Reinizializzazione dell'AutoplayController con il modello selezionato senza interrompere l'esecuzione
+4. **Riconoscimento della complessità**: Analisi automatica del nome del file per determinare la complessità del modello
+
+### Implementazione Tecnica
+
+```python
+def refresh_checkpoint_list(self):
+    """Aggiorna la lista dei checkpoint disponibili nel sistema."""
+    checkpoint_dir = os.path.join("training", "checkpoints")
+    if os.path.exists(checkpoint_dir):
+        # Trova tutti i file .pt (checkpoint PyTorch)
+        self.available_checkpoints = sorted(
+            [f for f in glob.glob(os.path.join(checkpoint_dir, "*.pt")) 
+             if "_memory" not in f],  # Esclude i file di memoria
+            key=os.path.getmtime,  # Ordina per data di modifica
+            reverse=True  # Più recenti prima
+        )
+```
+
+### Integrazione con l'AutoplayController
+
+Il sistema di selezione modelli si integra con l'AutoplayController esistente attraverso l'interfaccia:
+
+```python
+def load_selected_model(self):
+    """Carica il modello selezionato nell'autoplay controller."""
+    checkpoint_path = self.get_current_model_path()
+    if checkpoint_path and os.path.exists(checkpoint_path):
+        # Ottieni la complessità del modello dal nome del file
+        model_complexity = "base"  # Default
+        for complexity in ["base", "avanzato", "complesso", "perfetto"]:
+            if complexity in os.path.basename(checkpoint_path):
+                model_complexity = complexity
+                break
+        
+        # Reinizializza il controller autoplay con il nuovo modello
+        env = SnakeEnv(self.game)
+        self.autoplay_controller = AutoplayController(
+            env=env,
+            model_complexity=model_complexity,
+            checkpoint_path=checkpoint_path
+        )
+```
+
+### Utilizzo Programmato
+
+È possibile integrare la selezione del modello in modalità programmatica utilizzando l'API:
+
+```python
+# Creazione dell'interfaccia utente con AutoplayController
+game = SnakeGame(grid_size=20)
+env = SnakeEnv(game)
+controller = AutoplayController(env=env, model_complexity="base")
+ui = GameUI(game=game, speed=10, autoplay_controller=controller)
+
+# Attivazione della finestra di selezione modello
+ui.toggle_model_selector()
+
+# Esecuzione del loop di gioco
+ui.run()
+```
+
+### Avvio Diretto in Modalità Selezione
+
+È possibile avviare l'applicazione direttamente con la finestra di selezione del modello utilizzando il parametro `--select-model`:
+
+```bash
+python main.py --mode autoplay --select-model
+```
+
+### Ottimizzazione del Caricamento Modelli
+
+Il caricamento dei modelli è ottimizzato per:
+
+- **Rilevamento hardware**: Identificazione automatica di CPU/GPU disponibili
+- **Trasferimento memoria**: Caricamento efficiente dei pesi del modello dall'archiviazione alla memoria
+- **Gestione errori**: Recovery automatico in caso di modelli incompatibili o corrotti
+
+### Confronto tra Modelli
+
+La selezione dinamica dei modelli facilita l'analisi comparativa delle prestazioni di diversi modelli, permettendo di:
+
+- Confrontare modelli di diverse complessità sullo stesso ambiente
+- Valutare l'influenza di diversi iperparametri sulla performance
+- Osservare differenze nei pattern decisionali tra modelli addestrati con approcci diversi
+
 ---
 
 Per una comprensione approfondita dell'architettura sottostante e dei meccanismi di implementazione, consultare la [Guida al Codice](CODE_GUIDE.md). 

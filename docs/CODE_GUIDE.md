@@ -156,7 +156,7 @@ class SnakeGame:
         Implementa le regole di invarianti di dominio che impediscono inversioni di direzione.
         
         Args:
-            action (int): Azione da eseguire (0: avanti, 1: destra, 2: sinistra)
+            action (int): Azione da eseguire (0: avanti, 1: destra, 2: sinistra, 3: indietro)
             
         Returns:
             tuple: Nuova direzione come vettore (dx, dy)
@@ -167,6 +167,8 @@ class SnakeGame:
             return (dy, -dx)
         elif action == 2:  # Sinistra (rotazione 90° antiorario)
             return (-dy, dx)
+        elif action == 3:  # Indietro (rotazione 180°)
+            return (-dx, -dy)
         else:  # Avanti (mantieni direzione)
             return (dx, dy)
             
@@ -288,7 +290,7 @@ class SnakeEnv(gym.Env):
         Esegue un'azione nell'ambiente e restituisce il risultato.
         
         Args:
-            action (int): Azione da eseguire (0=avanti, 1=destra, 2=sinistra)
+            action (int): Azione da eseguire (0=avanti, 1=destra, 2=sinistra, 3=indietro)
             
         Returns:
             tuple: (observation, reward, terminated, truncated, info)

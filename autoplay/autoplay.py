@@ -50,12 +50,17 @@ class AutoplayController:
         state_dim = env.observation_space.shape[0]
         action_dim = env.action_space.n
         
+        print(f"Dimensione stato: {state_dim}, Dimensione azione: {action_dim}")
+        
         # Carica l'agente
         self.agent = self._load_agent(checkpoint_path, state_dim, action_dim)
         
         # Stato corrente
         self.current_state = None
         self.previous_action = 0  # Default: vai dritto
+        
+        # Debug info
+        self.debug_enabled = True
         
         # Metriche
         self.game_count = 0
@@ -126,13 +131,27 @@ class AutoplayController:
         Ottiene l'azione dal modello.
         
         Returns:
-            int: Azione da eseguire (0: dritto, 1: destra, 2: sinistra)
+            int: Azione da eseguire (0: dritto, 1: destra, 2: sinistra, 3: indietro)
         """
         if self.current_state is None:
             self._reset()
         
+        # Verifica la dimensione dello stato
+        if self.debug_enabled and hasattr(self, 'agent') and self.episode_steps == 0:
+            expected_dim = self.agent.state_dim
+            actual_dim = len(self.current_state)
+            print(f"Dimensione stato attesa: {expected_dim}, dimensione stato attuale: {actual_dim}")
+            print(f"Stato corrente: {self.current_state}")
+        
         # Ottieni l'azione dall'agente (usa epsilon=0 per disabilitare l'esplorazione)
         action = self.agent.select_action(self.current_state, training=False)
+        
+        # Debug info per comprendere le decisioni del modello
+        if self.debug_enabled and self.episode_steps % 10 == 0:
+            head = self.env.snake_game.snake[0]
+            food = self.env.snake_game.food
+            print(f"Posizione testa: {head}, Posizione cibo: {food}, Distanza: {abs(head[0]-food[0]) + abs(head[1]-food[1])}")
+            print(f"Azione scelta: {action}")
         
         # Aggiorna lo stato in base all'azione
         next_state, reward, terminated, truncated, info = self.env.step(action)
@@ -151,6 +170,10 @@ class AutoplayController:
             self.scores.append(score)
             if score > self.max_score:
                 self.max_score = score
+            
+            # Debug info quando termina un episodio
+            if self.debug_enabled:
+                print(f"Episodio {self.game_count} terminato. Punteggio: {score}, Passi: {self.episode_steps}")
             
             # Resetta per il prossimo episodio
             self._reset()

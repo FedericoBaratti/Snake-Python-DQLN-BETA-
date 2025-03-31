@@ -59,15 +59,15 @@ class SyntheticSnakeEnv(gym.Env):
             (0, -1)   # su
         ]
         
-        # Definisci lo spazio delle azioni: 0 (dritto), 1 (destra), 2 (sinistra)
-        self.action_space = spaces.Discrete(3)
+        # Definisci lo spazio delle azioni: 0 (dritto), 1 (destra), 2 (sinistra), 3 (indietro)
+        self.action_space = spaces.Discrete(4)
         
         # Spazio di osservazione: vettore di caratteristiche
-        # [pericoli (3), direzione (4), distanza cibo (2)]
+        # [pericoli (4), direzione (4), distanza cibo (2)]
         self.observation_space = spaces.Box(
             low=-1.0, 
             high=1.0, 
-            shape=(9,), 
+            shape=(10,), 
             dtype=np.float32
         )
         
@@ -185,7 +185,7 @@ class SyntheticSnakeEnv(gym.Env):
         Calcola la nuova direzione in base all'azione.
         
         Args:
-            action (int): Azione (0: dritto, 1: destra, 2: sinistra)
+            action (int): Azione (0: dritto, 1: destra, 2: sinistra, 3: indietro)
         
         Returns:
             int: Nuova direzione (0: destra, 1: giù, 2: sinistra, 3: su)
@@ -196,6 +196,8 @@ class SyntheticSnakeEnv(gym.Env):
             return (self.direction + 1) % 4
         elif action == 2:  # Gira a sinistra
             return (self.direction - 1) % 4
+        elif action == 3:  # Gira indietro
+            return (self.direction + 2) % 4
         else:
             return self.direction
     
@@ -256,8 +258,8 @@ class SyntheticSnakeEnv(gym.Env):
         food_dx = (food_x - head_x) / self.grid_size
         food_dy = (food_y - head_y) / self.grid_size
         
-        # Pericoli nelle tre direzioni (davanti, destra, sinistra)
-        dangers = np.zeros(3, dtype=np.float32)
+        # Pericoli nelle quattro direzioni (davanti, destra, sinistra, indietro)
+        dangers = np.zeros(4, dtype=np.float32)
         
         # Controlla il pericolo davanti
         front_dir = self.direction
@@ -276,6 +278,12 @@ class SyntheticSnakeEnv(gym.Env):
         left_x, left_y = self.directions[left_dir]
         left_pos = ((head_x + left_x) % self.grid_size, (head_y + left_y) % self.grid_size)
         dangers[2] = left_pos in list(self.snake)[1:]
+        
+        # Controlla il pericolo dietro
+        back_dir = (self.direction + 2) % 4
+        back_x, back_y = self.directions[back_dir]
+        back_pos = ((head_x + back_x) % self.grid_size, (head_y + back_y) % self.grid_size)
+        dangers[3] = back_pos in list(self.snake)[1:]
         
         # Direzione corrente (one-hot encoding)
         dir_one_hot = np.zeros(4, dtype=np.float32)
@@ -338,7 +346,7 @@ class SyntheticSnakeEnv(gym.Env):
         Esegue un passo nell'ambiente.
         
         Args:
-            action (int): Azione da eseguire (0: dritto, 1: destra, 2: sinistra)
+            action (int): Azione da eseguire (0: dritto, 1: destra, 2: sinistra, 3: indietro)
         
         Returns:
             tuple: Osservazione, reward, terminato, troncato, info

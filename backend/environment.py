@@ -41,16 +41,16 @@ class SnakeEnv(gym.Env):
         self.grid_size = self.snake_game.get_grid_size()
         self.use_normalized_state = use_normalized_state
         
-        # Definisci lo spazio delle azioni: 0 (dritto), 1 (destra), 2 (sinistra)
-        self.action_space = spaces.Discrete(3)
+        # Definisci lo spazio delle azioni: 0 (dritto), 1 (destra), 2 (sinistra), 3 (indietro)
+        self.action_space = spaces.Discrete(4)
         
         if use_normalized_state:
             # Stato normalizzato: vettore di caratteristiche
-            # [pericoli (3), direzione (4), distanza cibo (2)]
+            # [pericoli (4), direzione (4), distanza cibo (2)]
             self.observation_space = spaces.Box(
                 low=-1.0, 
                 high=1.0, 
-                shape=(9,), 
+                shape=(10,), 
                 dtype=np.float32
             )
         else:
@@ -67,7 +67,7 @@ class SnakeEnv(gym.Env):
         Esegue un'azione nell'ambiente.
         
         Args:
-            action (int): Azione da eseguire (0: dritto, 1: destra, 2: sinistra)
+            action (int): Azione da eseguire (0: dritto, 1: destra, 2: sinistra, 3: indietro)
             
         Returns:
             tuple:
@@ -151,4 +151,4 @@ class SnakeEnv(gym.Env):
             list: Lista di azioni valide
         """
         # Nel nostro caso tutte le azioni sono sempre valide
-        return [0, 1, 2] 
+        return [0, 1, 2, 3] 

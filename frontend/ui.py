@@ -14,6 +14,8 @@ import sys
 import time
 import numpy as np
 from pygame.locals import *
+import os
+import glob
 
 # Colori per l'interfaccia
 BLACK = (0, 0, 0)
@@ -39,6 +41,7 @@ class GameUI:
     - Rendering del serpente e del cibo
     - Visualizzazione di punteggio e informazioni aggiuntive
     - Controllo modalità autoplay
+    - Selezione del modello da caricare
     """
     
     def __init__(self, game, cell_size=30, speed=10, autoplay_controller=None):
@@ -96,6 +99,8 @@ class GameUI:
             K_s: 1,      # S -> gira a destra se direzione è destra
             K_a: 2,      # A -> gira a sinistra se direzione è giù
             K_d: 1,      # D -> gira a destra se direzione è giù
+            K_b: 3,      # B -> gira indietro (180 gradi)
+            K_BACKSPACE: 3  # Backspace -> gira indietro (180 gradi)
         }
         
         # Memorizza l'ultima azione e timestamp
@@ -107,6 +112,114 @@ class GameUI:
         
         # Informazioni sulla modalità corrente
         self.mode_info = "Modalità manuale" if not self.autoplay_enabled else "Modalità autoplay"
+        
+        # Lista dei checkpoint disponibili
+        self.available_checkpoints = []
+        self.current_checkpoint_idx = 0
+        self.refresh_checkpoint_list()
+        
+        # Flag per mostrare la finestra di selezione del modello
+        self.show_model_selector = False
+    
+    def refresh_checkpoint_list(self):
+        """Aggiorna la lista dei checkpoint disponibili nel sistema."""
+        checkpoint_dir = os.path.join("training", "checkpoints")
+        if os.path.exists(checkpoint_dir):
+            # Trova tutti i file .pt (checkpoint PyTorch)
+            self.available_checkpoints = sorted(
+                [f for f in glob.glob(os.path.join(checkpoint_dir, "*.pt")) 
+                 if "_memory" not in f],  # Esclude i file di memoria
+                key=os.path.getmtime,  # Ordina per data di modifica
+                reverse=True  # Più recenti prima
+            )
+            
+            # Aggiungi anche l'opzione "Nessun checkpoint" all'inizio
+            self.available_checkpoints = ["Nessun checkpoint"] + self.available_checkpoints
+            
+            # Resetta l'indice del checkpoint corrente
+            self.current_checkpoint_idx = 0
+        else:
+            # Se la directory non esiste, crea una lista con solo "Nessun checkpoint"
+            self.available_checkpoints = ["Nessun checkpoint"]
+            self.current_checkpoint_idx = 0
+    
+    def toggle_model_selector(self):
+        """Attiva/disattiva la finestra di selezione del modello."""
+        self.show_model_selector = not self.show_model_selector
+        if self.show_model_selector:
+            # Aggiorna la lista dei checkpoint quando apri il selettore
+            self.refresh_checkpoint_list()
+    
+    def change_selected_model(self, direction):
+        """
+        Cambia il modello selezionato nella lista.
+        
+        Args:
+            direction (int): 1 per avanzare, -1 per tornare indietro
+        """
+        if self.available_checkpoints:
+            self.current_checkpoint_idx = (self.current_checkpoint_idx + direction) % len(self.available_checkpoints)
+    
+    def get_current_model_path(self):
+        """
+        Restituisce il percorso del modello attualmente selezionato.
+        
+        Returns:
+            str: Percorso del checkpoint o None se "Nessun checkpoint" è selezionato
+        """
+        if not self.available_checkpoints or self.current_checkpoint_idx == 0:
+            return None
+        return self.available_checkpoints[self.current_checkpoint_idx]
+    
+    def load_selected_model(self):
+        """
+        Carica il modello selezionato nell'autoplay controller.
+        
+        Returns:
+            bool: True se il caricamento è avvenuto con successo, False altrimenti
+        """
+        if not self.autoplay_controller:
+            return False
+            
+        checkpoint_path = self.get_current_model_path()
+        if checkpoint_path and os.path.exists(checkpoint_path):
+            # Ottieni la complessità del modello dal nome del file
+            model_complexity = "base"  # Default
+            for complexity in ["base", "avanzato", "complesso", "perfetto"]:
+                if complexity in os.path.basename(checkpoint_path):
+                    model_complexity = complexity
+                    break
+            
+            try:
+                # Reinizializza il controller autoplay con il nuovo modello
+                from autoplay.autoplay import AutoplayController
+                from backend.environment import SnakeEnv
+                
+                # Ricrea l'ambiente
+                env = SnakeEnv(self.game)
+                
+                # Crea un nuovo controller con il checkpoint selezionato
+                self.autoplay_controller = AutoplayController(
+                    env=env,
+                    model_complexity=model_complexity,
+                    checkpoint_path=checkpoint_path
+                )
+                
+                # Aggiorna le informazioni di modalità
+                model_name = os.path.basename(checkpoint_path).replace('.pt', '')
+                self.mode_info = f"Autoplay: {model_name}"
+                
+                # Attiva la modalità autoplay
+                self.toggle_autoplay = True
+                
+                # Chiudi il selettore
+                self.show_model_selector = False
+                
+                return True
+            except Exception as e:
+                print(f"Errore nel caricamento del modello: {e}")
+                return False
+        return False
     
     def toggle_autoplay_mode(self):
         """Attiva/disattiva la modalità autoplay se il controller è disponibile."""
@@ -119,7 +232,7 @@ class GameUI:
         Gestisce l'input dell'utente (tastiera/eventi).
         
         Returns:
-            int: Azione da eseguire (0: dritto, 1: destra, 2: sinistra)
+            int: Azione da eseguire (0: dritto, 1: destra, 2: sinistra, 3: indietro)
         """
         action = self.last_action  # Default: mantieni l'ultima azione
         
@@ -129,6 +242,18 @@ class GameUI:
                 return action
             
             elif event.type == KEYDOWN:
+                # Se il selettore di modelli è attivo, gestisci i suoi controlli
+                if self.show_model_selector:
+                    if event.key == K_UP:
+                        self.change_selected_model(-1)
+                    elif event.key == K_DOWN:
+                        self.change_selected_model(1)
+                    elif event.key == K_RETURN:
+                        self.load_selected_model()
+                    elif event.key == K_ESCAPE:
+                        self.show_model_selector = False
+                    return action  # Non processare altri input durante la selezione
+                
                 # Gestione tasti per le azioni
                 if event.key in self.direction_map:
                     if not self.toggle_autoplay:  # Solo se non in autoplay
@@ -144,6 +269,8 @@ class GameUI:
                     action = 0  # Reset dell'azione
                 elif event.key == K_t:
                     self.toggle_autoplay_mode()
+                elif event.key == K_m:
+                    self.toggle_model_selector()
                 elif event.key in [K_PLUS, K_EQUALS]:
                     self.speed = min(self.speed + 1, 20)
                 elif event.key in [K_MINUS, K_UNDERSCORE]:
@@ -156,7 +283,7 @@ class GameUI:
         Determina la prossima azione in base alla modalità (manuale/autoplay).
         
         Returns:
-            int: Azione da eseguire (0: dritto, 1: destra, 2: sinistra)
+            int: Azione da eseguire (0: dritto, 1: destra, 2: sinistra, 3: indietro)
         """
         # Gestisci input utente
         action = self.handle_input()
@@ -313,6 +440,7 @@ class GameUI:
             "SPAZIO: Pausa",
             "R: Ricomincia",
             "T: Attiva/disattiva autoplay",
+            "M: Selezione modello",
             "+/-: Cambia velocità",
             "ESC: Esci"
         ]
@@ -325,6 +453,84 @@ class GameUI:
                 (self.grid_size * self.cell_size + 20, y_offset)
             )
             y_offset += 30
+    
+    def draw_model_selector(self):
+        """Disegna la finestra di selezione del modello."""
+        if not self.show_model_selector:
+            return
+        
+        # Dimensioni della finestra di selezione
+        selector_width = min(self.window_width - 100, 600)
+        selector_height = min(self.window_height - 100, 400)
+        
+        # Posizione centrale della finestra
+        selector_x = (self.window_width - selector_width) // 2
+        selector_y = (self.window_height - selector_height) // 2
+        
+        # Disegna lo sfondo semi-trasparente
+        overlay = pygame.Surface((self.window_width, self.window_height), pygame.SRCALPHA)
+        overlay.fill((0, 0, 0, 180))  # Nero semi-trasparente
+        self.window.blit(overlay, (0, 0))
+        
+        # Disegna il rettangolo della finestra
+        selector_rect = pygame.Rect(selector_x, selector_y, selector_width, selector_height)
+        pygame.draw.rect(self.window, (60, 60, 70), selector_rect)
+        pygame.draw.rect(self.window, WHITE, selector_rect, 2)  # Bordo
+        
+        # Titolo
+        title_surface = self.title_font.render("Seleziona Modello", True, WHITE)
+        title_rect = title_surface.get_rect(center=(selector_x + selector_width // 2, selector_y + 30))
+        self.window.blit(title_surface, title_rect)
+        
+        # Istruzioni
+        instructions = self.info_font.render("Usa ↑↓ per navigare, INVIO per selezionare, ESC per annullare", True, GRAY)
+        instructions_rect = instructions.get_rect(center=(selector_x + selector_width // 2, selector_y + selector_height - 30))
+        self.window.blit(instructions, instructions_rect)
+        
+        # Lista dei checkpoint
+        if not self.available_checkpoints:
+            msg = self.info_font.render("Nessun checkpoint disponibile", True, RED)
+            msg_rect = msg.get_rect(center=(selector_x + selector_width // 2, selector_y + selector_height // 2))
+            self.window.blit(msg, msg_rect)
+        else:
+            # Calcola quanti elementi possiamo mostrare
+            item_height = 40
+            visible_items = min(8, len(self.available_checkpoints))
+            
+            # Calcola l'offset per centrare la lista
+            list_y = selector_y + 80
+            
+            # Determina l'intervallo di indici da visualizzare
+            start_idx = max(0, self.current_checkpoint_idx - (visible_items // 2))
+            end_idx = min(start_idx + visible_items, len(self.available_checkpoints))
+            
+            # Ajusta l'inizio se non abbiamo abbastanza elementi alla fine
+            if end_idx - start_idx < visible_items:
+                start_idx = max(0, end_idx - visible_items)
+            
+            # Disegna gli elementi visibili
+            for i in range(start_idx, end_idx):
+                checkpoint = self.available_checkpoints[i]
+                
+                # Determina il nome da visualizzare
+                if checkpoint == "Nessun checkpoint":
+                    display_name = checkpoint
+                else:
+                    display_name = os.path.basename(checkpoint)
+                
+                # Evidenzia l'elemento selezionato
+                text_color = BRIGHT_GREEN if i == self.current_checkpoint_idx else WHITE
+                
+                # Disegna lo sfondo per l'elemento selezionato
+                item_y = list_y + (i - start_idx) * item_height
+                if i == self.current_checkpoint_idx:
+                    item_rect = pygame.Rect(selector_x + 10, item_y - 5, selector_width - 20, item_height)
+                    pygame.draw.rect(self.window, (80, 80, 100), item_rect)
+                    pygame.draw.rect(self.window, (100, 100, 140), item_rect, 1)
+                
+                # Disegna il testo
+                item_surface = self.info_font.render(display_name, True, text_color)
+                self.window.blit(item_surface, (selector_x + 20, item_y))
     
     def update_game(self):
         """
@@ -385,6 +591,9 @@ class GameUI:
         self.draw_food()
         self.draw_snake()
         self.draw_sidebar()
+        
+        # Disegna la finestra di selezione del modello se attiva
+        self.draw_model_selector()
         
         # Aggiorna il display
         pygame.display.update()
