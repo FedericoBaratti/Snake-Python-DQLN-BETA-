@@ -1,7 +1,6 @@
 # Snake-Python-DQLN
 
 <div align="center">
-  <img src="images/snake.png" alt="Snake Game" width="400">
   <br>
   <h3>🐍 Advanced Deep Q-Learning Network for Snake Game 🧠</h3>
   <br>
