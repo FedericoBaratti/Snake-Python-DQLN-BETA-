@@ -83,7 +83,7 @@
 
 ```bash
 # Clone repository
-git clone https://github.com/yourusername/Snake-Python-DQLN.git
+git clone https://github.com/FedericoBaratti/Snake-Python-DQLN-BETA-
 cd Snake-Python-DQLN
 
 # Create virtual environment
